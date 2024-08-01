@@ -1,0 +1,21 @@
+- name: Set timezone to {{ samba_timezone }}
+  community.general.timezone:
+    name: "{{ samba_timezone }}"
+
+- name: Output hostinfo
+  ansible.builtin.debug:
+    msg: |
+      Hostname: {{ ansible_hostname }}
+      IPv4: {{ samba_ipaddresss }}
+
+- name: Set hostname to ansible_hostname
+  ansible.builtin.hostname:
+    name: "{{ ansible_hostname }}"
+
+- name: Copy ntp.conf
+  ansible.builtin.copy:
+    src: ntp.conf
+    dest: /etc/ntp.conf
+    mode: '644'
+    backup: true
+    force: true

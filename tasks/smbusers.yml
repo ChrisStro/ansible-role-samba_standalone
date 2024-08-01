@@ -1,0 +1,12 @@
+- name: Create user for smb access
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    password: "{{ item.passwd | password_hash('sha512') }}"
+    update_password: on_create
+    shell: /sbin/nologin
+    create_home: false
+  with_items:
+    - "{{ smb_users }}"
+  register: users_out
+  notify:
+    - Samba passwords

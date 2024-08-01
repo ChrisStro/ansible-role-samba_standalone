@@ -1,0 +1,45 @@
+# standalone smbd
+- name: Restart smbd
+  ansible.builtin.service:
+    name: smbd
+    state: restarted
+  become: true
+
+# Windows service discovery daemon
+- name: Restart wsdd
+  ansible.builtin.service:
+    name: wsdd
+    state: restarted
+  become: true
+
+#  NetBIOS name server
+- name: Restart nmbd
+  ansible.builtin.service:
+    name: nmbd
+    state: restarted
+  become: true
+
+- name: Samba passwords
+  changed_when: users_out.changed
+  ansible.builtin.shell: "set -o pipefail && printf '{{ item.passwd }}\n{{ item.passwd }}\n' | smbpasswd -a {{ item.name }}"
+  with_items:
+    - "{{ smb_users }}"
+
+- name: Import global samba config
+  ansible.builtin.command:
+    cmd: net conf import /etc/samba/import.template
+  when: import_out.changed
+  changed_when: import_out.changed
+  notify:
+    - Restart smbd
+    - Restart wsdd
+    - Restart nmbd
+
+- name: Create samba share
+  ansible.builtin.shell: |
+      net conf addshare Share /FILESERVER/Share
+      net conf setparm Share readonly no
+      net conf setparm Share browseable yes
+      net conf setparm Share createmask 0660
+      net conf setparm Share directorymask 0770
+  changed_when: import_out.changed

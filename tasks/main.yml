@@ -1,0 +1,15 @@
+- name: Prepare machine for samba
+  ansible.builtin.import_tasks: prepare.yml
+
+- name: Install debian based machine for samba
+  ansible.builtin.import_tasks: install_debianbase.yml
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: Create smb users
+  ansible.builtin.import_tasks: smbusers.yml
+
+- name: Configure samba
+  ansible.builtin.import_tasks: conf_samba.yml
+
+- name: Enforce handlers
+  ansible.builtin.meta: flush_handlers

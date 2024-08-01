@@ -1,0 +1,32 @@
+- name: Create directory for samba share
+  ansible.builtin.file:
+    path: /FILESERVER/Share
+    state: directory
+    owner: smbadmin
+    group: root
+    mode: '770'
+
+- name: Backup original copy smb.conf
+  ansible.builtin.command: mv /etc/samba/smb.conf /root/smb.conf.org
+  args:
+    creates: /root/smb.conf.org
+
+- name: Copy smb.conf
+  ansible.builtin.copy:
+    src: files/smb.conf
+    dest: /etc/samba/smb.conf
+    mode: '644'
+    force: true
+
+- name: Copy import.template
+  ansible.builtin.copy:
+    src: files/import.template
+    dest: /etc/samba/import.template
+    mode: '644'
+    force: true
+  notify:
+    - Restart smbd
+    - Restart nmbd
+    - Restart wsdd
+    - Import global samba config
+    - Create samba share

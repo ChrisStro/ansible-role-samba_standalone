@@ -1,0 +1,12 @@
+# debian
+debian_packages:
+  - acl
+  - samba
+  - samba-common
+  - samba-common-bin
+  - samba-dsdb-modules
+  - samba-vfs-modules
+  - samba-libs
+  - libwbclient0
+  - winbind
+  - wsdd
